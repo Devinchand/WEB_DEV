@@ -1,10 +1,19 @@
-import gsheetsdb
 import streamlit as st
-import pandas as pd
+import pandas as pd #if you will
+import gspread
+from google.oauth2 import service_account
 
-st.title("Connect to Google Sheets")
-gsheet_url = "https://docs.google.com/spreadsheets/d/1s1MSs8-bu_KIgbC33mVNy_zrlBnSPhD6YR91qW0sHJo/edit?usp=sharing"
-conn = connect()
-rows = conn.execute(f'SELECT * FROM "{gsheet_url}"')
-df_gsheet = pd.DataFrame(rows)
-st.write(df_gsheet)
+# Create a connection object.
+credentials = service_account.Credentials.from_service_account_info(
+    st.secrets["gcp_service_account"],
+    scopes=[
+        "https://www.googleapis.com/auth/spreadsheets","https://www.googleapis.com/auth/drive"
+    ],
+)
+conn = connect(credentials=credentials)
+client=gspread.authorize(credentials)
+
+sheet_id = "1s1MSs8-bu_KIgbC33mVNy_zrlBnSPhD6YR91qW0sHJo"
+sheet_name = "datapenduduk"
+url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
+datapenduduk = pd.read_csv(url)
